@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Analyzer</h1>
+        <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
+            <div class="mb-3">
+                <label for="file" class="form-label">Upload PDF:</label>
+                <input type="file" id="file" name="file" accept=".pdf" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="url" class="form-label">Or enter PDF URL:</label>
+                <input type="text" id="url" name="url" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze PDF</button>
+        </form>
+
+        <div id="loading" style="display: none;" class="alert alert-info">
+            Summarization in progress... <div class="spinner-border spinner-border-sm" role="status"></div>
+        </div>
+        <div id="error" style="display: none;" class="alert alert-danger"></div>
+        <div id="results" style="display: none;">
+            <h2>Metadata</h2>
+            <form id="metadataForm" class="mb-3">
+                <div class="mb-3"><label class="form-label">Title:</label><input type="text" id="title" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Authors:</label><input type="text" id="authors" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Affiliations:</label><textarea id="affiliations" class="form-control" readonly></textarea></div>
+                <div class="mb-3"><label class="form-label">Abstract:</label><textarea id="abstract" class="form-control" readonly></textarea></div>
+                <div class="mb-3"><label class="form-label">Keywords:</label><input type="text" id="keywords" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Publication Date:</label><input type="text" id="publication_date" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Journal:</label><input type="text" id="journal" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">DOI:</label><input type="text" id="doi" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Publisher:</label><input type="text" id="publisher" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Open Access:</label><input type="text" id="open_access" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Figures Count:</label><input type="text" id="figures_count" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Tables Count:</label><input type="text" id="tables_count" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">References Count:</label><input type="text" id="references_count" class="form-control" readonly></div>
+            </form>
+            <div id="summaryStatus" class="alert" style="display: none;"></div>
+            <button id="viewSummary" class="btn btn-secondary mb-3">View Summary</button>
+            <button id="addArticle" class="btn btn-success mb-3">Add to Collection</button>
+            <div id="summary" style="display: none;">
+                <h3>Summary</h3>
+                <p id="summaryText"></p>
+            </div>
+        </div>
+
+        <h2 class="mt-4">Article Collection</h2>
+        <div id="articleCollection" class="accordion">
+            {% for article in articles %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                        {{ article.metadata.title }} (DOI: {{ article.doi }})
+                    </button>
+                </h2>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#articleCollection">
+                    <div class="accordion-body">
+                        <p><strong>Authors:</strong> {{ article.metadata.authors }}</p>
+                        <p><strong>Affiliations:</strong> {{ article.metadata.affiliations | join(', ') }}</p>
+                        <p><strong>Abstract:</strong> {{ article.metadata.abstract }}</p>
+                        <p><strong>Keywords:</strong> {{ article.metadata.keywords | join(', ') }}</p>
+                        <p><strong>Publication Date:</strong> {{ article.metadata.publication_date }}</p>
+                        <p><strong>Journal:</strong> {{ article.metadata.journal }}</p>
+                        <p><strong>DOI:</strong> {{ article.doi }}</p>
+                        <p><strong>Publisher:</strong> {{ article.metadata.publisher }}</p>
+                        <p><strong>Open Access:</strong> {{ 'Yes' if article.metadata.open_access else 'No' }}</p>
+                        <p><strong>Figures Count:</strong> {{ article.metadata.figures_count }}</p>
+                        <p><strong>Tables Count:</strong> {{ article.metadata.tables_count }}</p>
+                        <p><strong>References Count:</strong> {{ article.metadata.references_count }}</p>
+                        <p><strong>Summary:</strong> {{ article.summary }}</p>
+                        {% if article.pdf_path %}
+                        <a href="{{ url_for('static', filename=article.pdf_path | replace('uploads/', '')) }}" class="btn btn-primary" target="_blank">View PDF</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        let currentArticle = null;
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('summaryStatus').style.display = 'none';
+
+            const formData = new FormData(e.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('loading').style.display = 'none';
+
+            if (result.error) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerText = result.error;
+            } else {
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('title').value = result.metadata.title;
+                document.getElementById('authors').value = result.metadata.authors;
+                document.getElementById('affiliations').value = result.metadata.affiliations.join('\n');
+                document.getElementById('abstract').value = result.metadata.abstract;
+                document.getElementById('keywords').value = result.metadata.keywords.join(', ');
+                document.getElementById('publication_date').value = result.metadata.publication_date;
+                document.getElementById('journal').value = result.metadata.journal;
+                document.getElementById('doi').value = result.metadata.doi;
+                document.getElementById('publisher').value = result.metadata.publisher;
+                document.getElementById('open_access').value = result.metadata.open_access ? 'Yes' : 'No';
+                document.getElementById('figures_count').value = result.metadata.figures_count;
+                document.getElementById('tables_count').value = result.metadata.tables_count;
+                document.getElementById('references_count').value = result.metadata.references_count;
+                document.getElementById('summaryText').innerText = result.summary;
+                document.getElementById('summaryStatus').style.display = 'block';
+                document.getElementById('summaryStatus').innerText = result.summary_status;
+                document.getElementById('summaryStatus').className = result.summary_status.includes('Error') ? 'alert alert-danger' : 'alert alert-success';
+
+                currentArticle = result; // Store for "Add" button
+            }
+        });
+
+        document.getElementById('viewSummary').addEventListener('click', () => {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = summaryDiv.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('addArticle').addEventListener('click', () => {
+            if (currentArticle) {
+                fetch('/add_article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentArticle)
+                }).then(() => {
+                    window.location.reload(); // Refresh to update accordion
+                });
+            }
+        });
+    </script>
+</body>
+</html>
