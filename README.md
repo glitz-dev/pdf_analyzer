@@ -1,7 +1,3 @@
-Apologies for the misunderstanding! Below is a streamlined `README.md` file containing only the instructions for setting up, deploying, and maintaining the PDF Analyzer Flask application. It covers setting up the Python environment, resolving Git push issues, deploying to PythonAnywhere, using the Unpaywall API, and sharing the app with testers. The instructions are written for someone else to follow, assuming they have access to your GitHub repository (`github.com/gadepallivs/pdf_analyzer`) and a PythonAnywhere account. No code files are included, only step-by-step guidance.
-
----
-
 # PDF Analyzer
 
 This Flask-based web application analyzes PDF articles by extracting metadata (Title, Authors, Affiliations, Abstract, Keywords, Publication Date, Journal, DOI, Publisher, Open Access Status, Figures & Tables Count, Reference Count), generating summaries using a transformer model, and storing articles in an accordion-style collection. It uses the Unpaywall API (with CrossRef fallback) for metadata and supports uploading PDFs or URLs.
@@ -382,5 +378,3 @@ To share locally without PythonAnywhere:
    ```
    Reload the web app (**Web** tab → “Reload”).
 4. Share `http://gadepallivs.pythonanywhere.com` with testers.
-
-This README is concise, instruction-focused, and sufficient for someone else to set up the project. Let me know if you need adjustments or additional details!

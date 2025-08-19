@@ -42,6 +42,10 @@
                 <div class="mb-3"><label class="form-label">Figures Count:</label><input type="text" id="figures_count" class="form-control" readonly></div>
                 <div class="mb-3"><label class="form-label">Tables Count:</label><input type="text" id="tables_count" class="form-control" readonly></div>
                 <div class="mb-3"><label class="form-label">References Count:</label><input type="text" id="references_count" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Sections Detected:</label><input type="text" id="sections" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Readability Score (Flesch-Kincaid Grade):</label><input type="text" id="readability_score" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Citation Count:</label><input type="text" id="citation_count" class="form-control" readonly></div>
+                <div class="mb-3"><label class="form-label">Engagement Score:</label><input type="text" id="engagement_score" class="form-control" readonly></div>
             </form>
             <div id="summaryStatus" class="alert" style="display: none;"></div>
             <button id="viewSummary" class="btn btn-secondary mb-3">View Summary</button>
@@ -49,6 +53,10 @@
             <div id="summary" style="display: none;">
                 <h3>Summary</h3>
                 <p id="summaryText"></p>
+            </div>
+            <div id="wordcloud" style="display: none;">
+                <h3>Word Cloud</h3>
+                <img id="wordcloudImage" src="" alt="Word Cloud" style="max-width: 400px;">
             </div>
         </div>
 
@@ -58,7 +66,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading{{ loop.index }}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
-                        {{ article.metadata.title }} (DOI: {{ article.doi }})
+                        {{ article.metadata.title }} (DOI: {{ article.doi }}) - Engagement Score: {{ article.engagement_score }}
                     </button>
                 </h2>
                 <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#articleCollection">
@@ -75,7 +83,17 @@
                         <p><strong>Figures Count:</strong> {{ article.metadata.figures_count }}</p>
                         <p><strong>Tables Count:</strong> {{ article.metadata.tables_count }}</p>
                         <p><strong>References Count:</strong> {{ article.metadata.references_count }}</p>
+                        <p><strong>Sections Detected:</strong> {{ article.metadata.sections | join(', ') }}</p>
+                        <p><strong>Readability Score (Flesch-Kincaid Grade):</strong> {{ article.metadata.readability_score }}</p>
+                        <p><strong>Citation Count:</strong> {{ article.metadata.citation_count }}</p>
+                        <p><strong>Engagement Score:</strong> {{ article.engagement_score }}</p>
                         <p><strong>Summary:</strong> {{ article.summary }}</p>
+                        {% if article.metadata.wordcloud_path %}
+                        <p><strong>Word Cloud:</strong></p>
+                        <img src="{{ url_for('static', filename=article.metadata.wordcloud_path | replace('static/', '')) }}" alt="Word Cloud" style="max-width: 400px;">
+                        {% else %}
+                        <p><strong>Word Cloud:</strong> Not available</p>
+                        {% endif %}
                         {% if article.pdf_path %}
                         <a href="{{ url_for('static', filename=article.pdf_path | replace('uploads/', '')) }}" class="btn btn-primary" target="_blank">View PDF</a>
                         {% endif %}
@@ -91,43 +109,61 @@
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log("Submitting form");
             document.getElementById('loading').style.display = 'block';
             document.getElementById('error').style.display = 'none';
             document.getElementById('results').style.display = 'none';
             document.getElementById('summaryStatus').style.display = 'none';
+            document.getElementById('wordcloud').style.display = 'none';
 
             const formData = new FormData(e.target);
-            const response = await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('loading').style.display = 'none';
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                console.log("Upload response:", result);
+                document.getElementById('loading').style.display = 'none';
 
-            if (result.error) {
+                if (result.error) {
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').innerText = result.error;
+                } else {
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('title').value = result.metadata.title || 'Unknown';
+                    document.getElementById('authors').value = result.metadata.authors || 'Unknown';
+                    document.getElementById('affiliations').value = result.metadata.affiliations ? result.metadata.affiliations.join('\n') : 'Unknown';
+                    document.getElementById('abstract').value = result.metadata.abstract || 'Unknown';
+                    document.getElementById('keywords').value = result.metadata.keywords ? result.metadata.keywords.join(', ') : 'Unknown';
+                    document.getElementById('publication_date').value = result.metadata.publication_date || 'Unknown';
+                    document.getElementById('journal').value = result.metadata.journal || 'Unknown';
+                    document.getElementById('doi').value = result.metadata.doi || 'Unknown';
+                    document.getElementById('publisher').value = result.metadata.publisher || 'Unknown';
+                    document.getElementById('open_access').value = result.metadata.open_access ? 'Yes' : 'No';
+                    document.getElementById('figures_count').value = result.metadata.figures_count || 0;
+                    document.getElementById('tables_count').value = result.metadata.tables_count || 0;
+                    document.getElementById('references_count').value = result.metadata.references_count || 0;
+                    document.getElementById('sections').value = result.metadata.sections ? result.metadata.sections.join(', ') : 'None';
+                    document.getElementById('readability_score').value = result.metadata.readability_score || 'Unknown';
+                    document.getElementById('citation_count').value = result.metadata.citation_count || 0;
+                    document.getElementById('engagement_score').value = result.engagement_score || 0;
+                    document.getElementById('summaryText').innerText = result.summary || 'No summary available';
+                    document.getElementById('summaryStatus').style.display = 'block';
+                    document.getElementById('summaryStatus').innerText = result.summary_status || 'Unknown';
+                    document.getElementById('summaryStatus').className = result.summary_status.includes('Error') ? 'alert alert-danger' : 'alert alert-success';
+                    if (result.metadata.wordcloud_path) {
+                        document.getElementById('wordcloud').style.display = 'block';
+                        document.getElementById('wordcloudImage').src = '{{ url_for('static', filename='') }}' + result.metadata.wordcloud_path.replace('static/', '');
+                        console.log("Word cloud image set to:", document.getElementById('wordcloudImage').src);
+                    }
+                    currentArticle = result;
+                }
+            } catch (e) {
+                console.error("Upload error:", e);
+                document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').innerText = result.error;
-            } else {
-                document.getElementById('results').style.display = 'block';
-                document.getElementById('title').value = result.metadata.title;
-                document.getElementById('authors').value = result.metadata.authors;
-                document.getElementById('affiliations').value = result.metadata.affiliations.join('\n');
-                document.getElementById('abstract').value = result.metadata.abstract;
-                document.getElementById('keywords').value = result.metadata.keywords.join(', ');
-                document.getElementById('publication_date').value = result.metadata.publication_date;
-                document.getElementById('journal').value = result.metadata.journal;
-                document.getElementById('doi').value = result.metadata.doi;
-                document.getElementById('publisher').value = result.metadata.publisher;
-                document.getElementById('open_access').value = result.metadata.open_access ? 'Yes' : 'No';
-                document.getElementById('figures_count').value = result.metadata.figures_count;
-                document.getElementById('tables_count').value = result.metadata.tables_count;
-                document.getElementById('references_count').value = result.metadata.references_count;
-                document.getElementById('summaryText').innerText = result.summary;
-                document.getElementById('summaryStatus').style.display = 'block';
-                document.getElementById('summaryStatus').innerText = result.summary_status;
-                document.getElementById('summaryStatus').className = result.summary_status.includes('Error') ? 'alert alert-danger' : 'alert alert-success';
-
-                currentArticle = result; // Store for "Add" button
+                document.getElementById('error').innerText = 'Client-side error: ' + e.message;
             }
         });
 
@@ -138,13 +174,15 @@
 
         document.getElementById('addArticle').addEventListener('click', () => {
             if (currentArticle) {
+                console.log("Adding article:", currentArticle);
                 fetch('/add_article', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(currentArticle)
-                }).then(() => {
-                    window.location.reload(); // Refresh to update accordion
-                });
+                }).then(response => response.json()).then(data => {
+                    console.log("Add article response:", data);
+                    window.location.reload();
+                }).catch(e => console.error("Add article error:", e));
             }
         });
     </script>

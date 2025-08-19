@@ -13,19 +13,26 @@
       ],
       "abstract": "Unknown",
       "keywords": [
-        "DNA polymorphism; genetic variation; genome; sequencing"
+        "Unknown"
       ],
       "publisher": "Ovid Technologies (Wolters Kluwer Health)",
       "publication_date": "2012-02-21",
       "journal": "Circulation",
       "doi": "10.1161/CIRCULATIONAHA.110.972828",
       "open_access": false,
-      "figures_count": 5,
-      "tables_count": 3,
-      "references_count": 0
+      "figures_count": 0,
+      "tables_count": 0,
+      "references_count": 0,
+      "sections": [
+        "None"
+      ],
+      "readability_score": "Unknown",
+      "wordcloud_path": null,
+      "citation_count": 0
     },
     "summary": "NIH Public Access Author Manuscript Circulation . available in PMC 2013 February 21 . published in final edited form as: circulation. 2012 February 21; 125(7): 931\u2013944. doi:10.1161/CIRCULATIONAHA.110.972828 . the human genome project,1,2 the development of low cost, high-throughput parallel sequencing technology, and large-scale studies of genetic variation3 have provided a rich set of tequilas . the project will be completed by the end of january .",
-    "pdf_path": "uploads/Dna.pdf"
+    "pdf_path": "uploads/Dna.pdf",
+    "engagement_score": 0.0
   },
   {
     "doi": "10.1186/s12859-019-3251-1",
@@ -39,27 +46,28 @@
         "Biomedical Informatics, The Ohio State University, Columbus, OH, USA",
         "Biomedical Informatics, The Ohio State University, Columbus, OH, USA"
       ],
-      "abstract": "Background: RNA sequencing has become anincreasingly affordable way to profile gene expression patterns.Here\nweintroduce a workflow implementing severalopen-source softwares that can be run ona high performance\ncomputing environment.\nResults: DevelopedasatoolbytheBioinformaticsSharedResourceGroup(BISR)attheOhioStateUniversity,wehave\napplied the pipeline to a few publicly available RNAseq datasets downloaded from GEO in order to demonstrate the\nfeasibility of this workflow. Source code is available here: workflow: https://code.bmi.osumc.edu/gadepalli.3/BISR-\nRNAseq-ICIBM2019 and shiny: https://code.bmi.osumc.edu/gadepalli.3/BISR_RNASeq_ICIBM19. Example dataset is\ndemonstratedhere:https://dataportal.bmi.osumc.edu/RNA_Seq/.\nConclusion:Theworkflowallowsfortheanalysis(alignment,QC,gene-wisecountsgeneration)ofrawRNAseqdata\nandseamlessintegrationofqualityanalysisanddifferentialexpressionresultsintoaconfigurableRshinyweb\napplication.",
+      "abstract": "Unknown",
       "keywords": [
-        "RNAseq",
-        "Transcriptome",
-        "Workflow",
-        "Visualization\nBackground genome for alignment",
-        "and gene annotation set of ex-\nA whole transcriptome sequence provides an estimate of pression quantification. One of the challenges for the\nthe quantity of all transcripts present in a group of cells. analysis of transcriptome data is to have a reproducible\nHigh throughput sequencing technologies have been de- set of steps for consistent analysis. The aim of this study\nveloped to deep sequence the transcriptome. Sequencing was to generate a standardized workflow available to the\ngenerates several million short reads that are typically public that would make RNAseq analysis easier to im-\n50\u2013400 bases in length. These reads can be mapped to a plement",
-        "especially for non-expertusers.\nknown reference genome or assembled de-novo. Either The growth of genomics data has been exponential\nmethod will provide a snapshot of the transcript present over past 5years. The workflow established by various\nin the sample and an estimate of abundance. Statistical researchers to store",
-        "analyze and deliver the results have"
+        "Unknown"
       ],
       "publisher": "Springer Science and Business Media LLC",
       "publication_date": "2019-12-01",
       "journal": "BMC Bioinformatics",
       "doi": "10.1186/s12859-019-3251-1",
       "open_access": true,
-      "figures_count": 2,
+      "figures_count": 0,
       "tables_count": 0,
-      "references_count": 19
+      "references_count": 0,
+      "sections": [
+        "None"
+      ],
+      "readability_score": "Unknown",
+      "wordcloud_path": null,
+      "citation_count": 0
     },
     "summary": "RNA sequencing has become anincreasingly affluent in recent years . RNAseq analysis workflow is scalable and efficient . it is a scalable workflow with interactive report generation . Venkat Sundar Gadepalli1,2,3, Hatice Gulcin Ozer12,2,3, Ayse Selen Yilmaz12,3, Maciej Pietrzak1,2,3 and Amy Webb12,2 . DevelopedasatoolbytheBioinformaticsSharedResourceGroup (BISR)attheOhioStateUniversity applied the pipeline to a few publicly available RNAseq datasets downloaded from GEO .",
-    "pdf_path": "uploads/s12859-019-3251-1.pdf"
+    "pdf_path": "uploads/s12859-019-3251-1.pdf",
+    "engagement_score": 20.0
   },
   {
     "doi": "10.1038/s41419-021-04397-x",
@@ -82,11 +90,18 @@
       "journal": "Cell Death and Disease",
       "doi": "10.1038/s41419-021-04397-x",
       "open_access": true,
-      "figures_count": 1,
-      "tables_count": 8,
-      "references_count": 71
+      "figures_count": 0,
+      "tables_count": 0,
+      "references_count": 0,
+      "sections": [
+        "None"
+      ],
+      "readability_score": "Unknown",
+      "wordcloud_path": null,
+      "citation_count": 0
     },
     "summary": "ARTICLE OPEN XDeathDB is a visualization platform for cell death molecular interactions . Venkat SundarGadepalli1,4,Hangil Kim2,4, YuezeLiu3, TaoHan2and Lijun Cheng 2 . amongdifferentcelldeathmodesassociatedwith1461 cancertypes andCOVID-19 . anaim tounderstand themolecular mechanisms ofphysiological cells indisease . autosis, efferocytosis and ferroptosis .",
-    "pdf_path": "uploads/s41419-021-04397-x.pdf"
+    "pdf_path": "uploads/s41419-021-04397-x.pdf",
+    "engagement_score": 20.0
   }
 ]
