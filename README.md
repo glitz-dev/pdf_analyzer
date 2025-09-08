@@ -1,5 +1,12 @@
-# PDF Analyzer
 
+---
+title : pdf analyzer
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
+# PDF Analyzer
 This Flask-based web application analyzes PDF articles by extracting metadata (Title, Authors, Affiliations, Abstract, Keywords, Publication Date, Journal, DOI, Publisher, Open Access Status, Figures & Tables Count, Reference Count), generating summaries using a transformer model, and storing articles in an accordion-style collection. It uses the Unpaywall API (with CrossRef fallback) for metadata and supports uploading PDFs or URLs.
 
 This README provides instructions to set up the project locally, push to GitHub, deploy on PythonAnywhere, and share a public URL (e.g., `gadepallivs.pythonanywhere.com`) with testers. Testers can access existing articles or upload new ones without any setup.
