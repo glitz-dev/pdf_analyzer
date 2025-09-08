@@ -163,4 +163,7 @@ def add_article():
         return jsonify({'error': f'Failed to add article: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True) avoided for implementing huggingface port
+    port = int(os.environ.get("PORT", 7860))
+    app.run(host='0.0.0.0', port=port)    
+    logger.debug(f"Starting Flask app on port {port}")
